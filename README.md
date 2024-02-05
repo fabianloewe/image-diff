@@ -15,6 +15,7 @@ Options:
                            compare
   -s, --second=<path>      The second file or directory containing images to
                            compare
+  -o, --output=<path>      The file to write the diff to
   -c, --comparator=<text>  The comparator to use
   -h, --help               Show this message and exit
 ```
