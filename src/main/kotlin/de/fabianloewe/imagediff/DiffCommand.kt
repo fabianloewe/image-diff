@@ -15,12 +15,12 @@ class DiffCommand(
     private val coroutineContext: CoroutineContext,
     private val json: Json
 ) : CliktCommand() {
-    private val first by option("-f", "--first")
+    private val coverImagePath by option("-c", "--cover")
         .path()
         .required()
         .help("The first file or directory containing images to compare")
 
-    private val second by option("-s", "--second")
+    private val stegoImagePath by option("-s", "--stego")
         .path()
         .required()
         .help("The second file or directory containing images to compare")
@@ -28,18 +28,22 @@ class DiffCommand(
     private val output by option("-o", "--output")
         .path()
         .required()
-        .help("The file to write the diff to")
+        .help("The file or directory to write the diff(s) to")
 
-    private val comparatorsNames: Set<String> by option("-c", "--comparator")
+    private val splitOutput by option("--split")
+        .flag(default = false)
+        .help("Whether to split the output in multiple JSON files")
+
+    private val comparatorsNames: Set<String> by option("--comparator")
         .multiple(default = comparators.keys.toList())
         .unique()
         .help("The comparator to use")
 
     @OptIn(ExperimentalPathApi::class, ExperimentalSerializationApi::class)
     override fun run() {
-        if (first.isDirectory() && second.isDirectory()) {
-            val firstFiles = first.walk().filter { it.isRegularFile() }.toList()
-            val secondFiles = second.walk().filter { it.isRegularFile() }.toList()
+        if (coverImagePath.isDirectory() && stegoImagePath.isDirectory()) {
+            val firstFiles = coverImagePath.walk().filter { it.isRegularFile() }.toList()
+            val secondFiles = stegoImagePath.walk().filter { it.isRegularFile() }.toList()
             val pairs = firstFiles.zip(secondFiles)
 
             val diffResults = runBlocking(coroutineContext) {
@@ -50,12 +54,20 @@ class DiffCommand(
                     )
                 }
             }
-            val diffData = DiffData("1.0", System.currentTimeMillis(), diffResults)
-            json.encodeToStream(diffData, output.outputStream())
+
+            if (splitOutput) {
+                val dir = output.createDirectories()
+                for (diffRes in diffResults) {
+                    json.encodeToStream(diffRes, diffRes.outputStream(dir))
+                }
+            } else {
+                val diffData = DiffData("1.0", System.currentTimeMillis(), diffResults)
+                json.encodeToStream(diffData, output.outputStream())
+            }
         } else {
             compare(
-                Image(first, first.inputStream()),
-                Image(second, second.inputStream())
+                Image(coverImagePath, coverImagePath.inputStream()),
+                Image(stegoImagePath, stegoImagePath.inputStream())
             )
         }
     }
