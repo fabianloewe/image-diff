@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Added filters, exceptions; Restructured">
+    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Updated usage">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,6 +17,23 @@
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="image-diff" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -53,6 +71,8 @@
   "keyToString": {
     "Gradle.Build image-diff.executor": "Run",
     "Gradle.Download Sources.executor": "Run",
+    "Gradle.image-diff [jar].executor": "Run",
+    "JAR Application.image-diff-0.1-SNAPSHOT.jar.executor": "Run",
     "Kotlin.MainKt (-h).executor": "Run",
     "Kotlin.MainKt (all).executor": "Run",
     "Kotlin.MainKt.executor": "Debug",
@@ -79,7 +99,33 @@
       <recent name="de.fabianloewe.imagediff" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt (-h)">
+  <component name="RunManager" selected="JAR Application.image-diff-0.1-SNAPSHOT.jar">
+    <configuration name="image-diff [jar]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="jar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="image-diff-0.1-SNAPSHOT.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/build/libs/image-diff-0.1-SNAPSHOT.jar" />
+      <method v="2" />
+    </configuration>
     <configuration name="MainKt (-h)" type="JetRunConfigurationType">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
@@ -123,12 +169,15 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Gradle.image-diff [jar]" />
+      <item itemvalue="JAR Application.image-diff-0.1-SNAPSHOT.jar" />
       <item itemvalue="Kotlin.MainKt (-h)" />
       <item itemvalue="Kotlin.MainKt (all)" />
       <item itemvalue="Kotlin.MainKt (PixelKnot)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JAR Application.image-diff-0.1-SNAPSHOT.jar" />
         <item itemvalue="Kotlin.MainKt (PixelKnot)" />
       </list>
     </recent_temporary>
@@ -148,7 +197,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1707158515042</updated>
-      <workItem from="1707158516105" duration="21543000" />
+      <workItem from="1707158516105" duration="21910000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -190,7 +239,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707299739082</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Updated usage">
+      <option name="closed" value="true" />
+      <created>1707300050573</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1707300050573</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,7 +259,8 @@
     <MESSAGE value="Updated usage section" />
     <MESSAGE value="Improved JSON output" />
     <MESSAGE value="Added filters, exceptions; Restructured" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added filters, exceptions; Restructured" />
+    <MESSAGE value="Updated usage" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated usage" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
