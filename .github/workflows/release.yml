@@ -62,6 +62,8 @@ jobs:
       uses: gradle/actions/dependency-submission@ec92e829475ac0c2315ea8f9eced72db85bb337a # v3.0.0
 
   release:
+
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
