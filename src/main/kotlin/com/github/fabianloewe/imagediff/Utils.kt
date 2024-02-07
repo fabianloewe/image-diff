@@ -1,13 +1,21 @@
-package de.fabianloewe.imagediff
+package com.github.fabianloewe.imagediff
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import org.koin.core.component.KoinScopeComponent
 import java.io.OutputStream
 import java.nio.file.Path
-import kotlin.io.path.div
-import kotlin.io.path.name
-import kotlin.io.path.outputStream
+import kotlin.io.path.*
+
+val <T : KoinScopeComponent> T.logger get() = scope.logger
+
+@OptIn(ExperimentalPathApi::class)
+fun Path.gatherFiles() = when {
+    isDirectory() -> walk().filter { it.isRegularFile() }.toList()
+    isRegularFile() -> listOf(this)
+    else -> throw IllegalArgumentException("Path is not a file or directory")
+}
 
 suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
     map { async { f(it) } }.awaitAll()
@@ -22,7 +30,7 @@ operator fun DiffResult.plus(other: DiffResult): DiffResult {
     other.diff.forEach { (key, value) ->
         diff[key] = value
     }
-    return copy(diff = diff)
+    return DiffResult(cover, stego, diff = diff)
 }
 
 /**
