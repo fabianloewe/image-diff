@@ -4,18 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Improved JSON output">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Exceptions.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Statistics.kt" afterDir="false" />
+    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Added filters, exceptions; Restructured">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/fabianloewe/imagediff/Data.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/fabianloewe/imagediff/DiffCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/fabianloewe/imagediff/ImageComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageComparator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/fabianloewe/imagediff/Main.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/fabianloewe/imagediff/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/de/fabianloewe/imagediff/comparators/MetadataComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,9 +79,9 @@
       <recent name="de.fabianloewe.imagediff" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt (all)">
+  <component name="RunManager" selected="Kotlin.MainKt (-h)">
     <configuration name="MainKt (-h)" type="JetRunConfigurationType">
-      <option name="MAIN_CLASS_NAME" value="de.fabianloewe.imagediff.MainKt" />
+      <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
       <option name="PROGRAM_PARAMETERS" value="-h" />
       <shortenClasspath name="NONE" />
@@ -158,7 +148,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1707158515042</updated>
-      <workItem from="1707158516105" duration="20612000" />
+      <workItem from="1707158516105" duration="21543000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -192,7 +182,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707232965704</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added filters, exceptions; Restructured">
+      <option name="closed" value="true" />
+      <created>1707299739082</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1707299739082</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,7 +201,8 @@
     <MESSAGE value="Implemented output as JSON" />
     <MESSAGE value="Updated usage section" />
     <MESSAGE value="Improved JSON output" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improved JSON output" />
+    <MESSAGE value="Added filters, exceptions; Restructured" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added filters, exceptions; Restructured" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
