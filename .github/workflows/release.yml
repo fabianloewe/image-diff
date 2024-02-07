@@ -65,6 +65,9 @@ jobs:
 
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     
     steps:
     - name: Download JAR artifact
