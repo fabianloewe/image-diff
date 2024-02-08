@@ -2,6 +2,7 @@ package com.github.fabianloewe.imagediff
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import kotlinx.coroutines.runBlocking
@@ -53,7 +54,7 @@ class DiffCommand(
 
     private val splitOutput by option("--split")
         .flag(default = false)
-        .help("Whether to split the output in multiple JSON files")
+        .help("Whether to split the output in multiple JSON files (default: false)")
 
     private val comparatorsNames: Set<String> by option("--comparator")
         .multiple(default = comparators.keys.toList())
@@ -66,7 +67,12 @@ class DiffCommand(
 
     private val ignoreNulls by option("--ignore-nulls")
         .flag("--no-ignore-nulls", default = true)
-        .help("Whether to ignore null values for stego images in the diff output")
+        .help("Whether to ignore null values for stego images in the diff output (default: true)")
+
+    private val maxValueLen by option("-L", "--max-value-len")
+        .int()
+        .default(100)
+        .help("The maximum length of the value in the diff output (default: 100)")
 
     override fun run() {
         try {
@@ -137,14 +143,32 @@ class DiffCommand(
             diffResults.computeRateOfChanges(),
             diffResults.computeChangesPerImage()
         )
+
+        val optimizedDiffResults = diffResults.optimizeForOutput()
         if (splitOutput) {
             val dir = output.createDirectories()
-            for (diffRes in diffResults) {
+            for (diffRes in optimizedDiffResults) {
                 json.encodeToStream(diffRes, diffRes.outputStream(dir))
             }
         } else {
-            val diffData = DiffData("1.0", System.currentTimeMillis(), statistics, diffResults)
+            val diffData = DiffData("1.0", System.currentTimeMillis(), statistics, optimizedDiffResults)
             json.encodeToStream(diffData, output.outputStream())
+        }
+    }
+
+    private fun List<DiffResult>.optimizeForOutput(): List<DiffResult> {
+        return map { diffRes ->
+            diffRes.copy(
+                diff = diffRes.diff.mapValues { (_, value) ->
+                    value.mapValues { (_, v) ->
+                        // Truncate the value if it exceeds the maximum length
+                        v.copy(
+                            cover = v.cover?.take(maxValueLen - 1)?.let { "$it…" },
+                            stego = v.stego?.take(maxValueLen - 1)?.let { "$it…" },
+                        )
+                    }
+                }
+            )
         }
     }
 

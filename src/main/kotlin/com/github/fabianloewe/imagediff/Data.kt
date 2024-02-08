@@ -23,7 +23,7 @@ data class Image(val path: Path, @Transient val inputStream: InputStream = path.
 typealias DiffResultId = String
 
 @Serializable
-class DiffResult(val id: String, val coverPath: String, val stegoPath: String, val diff: Diff) {
+data class DiffResult(val id: String, val coverPath: String, val stegoPath: String, val diff: Diff) {
     constructor(cover: Image, stego: Image, diff: Diff) : this(
         cover.path.nameWithoutExtension + "_" + stego.path.nameWithoutExtension,
         cover.path.toString(),
