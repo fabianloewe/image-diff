@@ -16,17 +16,24 @@ class MetadataComparator : ImageComparator {
         val coverMetadata = extractMetadata(coverImage.inputStream)
         val stegoMetadata = extractMetadata(stegoImage.inputStream)
 
-        val metadataDiff = coverMetadata
-            .filter { (key, value) ->
-                stegoMetadata[key].let {
-                    if (ignoreNulls && it == null) {
+        val coverMetadataDiff = coverMetadata
+            .filter { (key, coverValue) ->
+                stegoMetadata[key].let { stegoValue ->
+                    if (ignoreNulls && stegoValue == null) {
                         false
                     } else {
-                        value != it
+                        coverValue != stegoValue
                     }
                 }
             }
             .mapValues { (key, value) -> DiffValue(value, stegoMetadata[key]) }
+        val stegoMetadataDiff = stegoMetadata
+            .filter { (key, value) ->
+                // Here we want to include null values in the cover image to show metadata that was added in the stego image
+                coverMetadata[key] != value
+            }
+            .mapValues { (key, value) -> DiffValue(coverMetadata[key], value) }
+        val metadataDiff = coverMetadataDiff + stegoMetadataDiff
         return DiffResult(coverImage, stegoImage, mapOf(NAME to metadataDiff))
     }
 
