@@ -25,5 +25,8 @@ Options:
   --comparator=<text>    The comparator to use
   -F, --filter=<value>   The case-sensitive filters to apply to the
                          correspondences list (e.g. --filter column1=value1)
+  --ignore-nulls / --no-ignore-nulls
+                         Whether to ignore null values for stego images in the
+                         diff output
   -h, --help             Show this message and exit
 ```
