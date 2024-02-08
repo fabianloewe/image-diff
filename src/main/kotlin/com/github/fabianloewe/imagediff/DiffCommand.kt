@@ -64,6 +64,10 @@ class DiffCommand(
         .associate()
         .help("The case-sensitive filters to apply to the correspondences list (e.g. --filter column1=value1)")
 
+    private val ignoreNulls by option("--ignore-nulls")
+        .flag("--no-ignore-nulls", default = true)
+        .help("Whether to ignore null values for stego images in the diff output")
+
     override fun run() {
         try {
             val diffResults = if (coverImagePath.isDirectory() && stegoImagePath.isDirectory()) {
@@ -79,7 +83,8 @@ class DiffCommand(
                         pairs.pmap { (first, second) ->
                             val res = compare(
                                 Image(first, first.inputStream()),
-                                Image(second, second.inputStream())
+                                Image(second, second.inputStream()),
+                                ignoreNulls
                             )
                             progressBar.step()
                             res
@@ -89,7 +94,8 @@ class DiffCommand(
             } else {
                 val diffRes = compare(
                     Image(coverImagePath, coverImagePath.inputStream()),
-                    Image(stegoImagePath, stegoImagePath.inputStream())
+                    Image(stegoImagePath, stegoImagePath.inputStream()),
+                    ignoreNulls
                 )
                 listOf(diffRes)
             }
@@ -142,10 +148,17 @@ class DiffCommand(
         }
     }
 
-    private fun compare(first: Image, second: Image): DiffResult {
+    /**
+     * Compare two images using the specified comparators.
+     * @param first The first image to compare
+     * @param second The second image to compare
+     * @param ignoreNulls Whether to ignore null values for stego images in the [DiffResult]
+     * @return The [DiffResult] of the comparison
+     */
+    private fun compare(first: Image, second: Image, ignoreNulls: Boolean): DiffResult {
         return comparatorsNames
             .mapNotNull { comparators[it] }
-            .map { it.compare(first, second) }
+            .map { it.compare(first, second, ignoreNulls) }
             .reduce { acc, diff -> acc + diff }
     }
 }

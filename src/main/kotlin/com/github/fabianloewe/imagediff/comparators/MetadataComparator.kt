@@ -4,15 +4,30 @@ import com.github.fabianloewe.imagediff.*
 import com.sksamuel.scrimage.metadata.ImageMetadata
 import java.io.InputStream
 
+/**
+ * Compares the metadata of two images.
+ */
 class MetadataComparator : ImageComparator {
-    override fun compare(first: Image, second: Image): DiffResult {
-        val firstMetadata = extractMetadata(first.inputStream)
-        val secondMetadata = extractMetadata(second.inputStream)
+    /**
+     * Compares the metadata of two images.
+     * @see ImageComparator.compare
+     */
+    override fun compare(coverImage: Image, stegoImage: Image, ignoreNulls: Boolean): DiffResult {
+        val coverMetadata = extractMetadata(coverImage.inputStream)
+        val stegoMetadata = extractMetadata(stegoImage.inputStream)
 
-        val metadataDiff = firstMetadata
-            .filter { (key, value) -> secondMetadata[key] != value }
-            .mapValues { (key, value) -> DiffValue(value, secondMetadata[key]) }
-        return DiffResult(first, second, mapOf(NAME to metadataDiff))
+        val metadataDiff = coverMetadata
+            .filter { (key, value) ->
+                stegoMetadata[key].let {
+                    if (ignoreNulls && it == null) {
+                        false
+                    } else {
+                        value != it
+                    }
+                }
+            }
+            .mapValues { (key, value) -> DiffValue(value, stegoMetadata[key]) }
+        return DiffResult(coverImage, stegoImage, mapOf(NAME to metadataDiff))
     }
 
     private fun extractMetadata(inputStream: InputStream): Map<DiffKey, String> {
