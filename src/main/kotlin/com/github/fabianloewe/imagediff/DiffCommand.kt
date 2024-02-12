@@ -5,12 +5,12 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToStream
+import kotlinx.serialization.json.*
 import me.tongfei.progressbar.ProgressBarBuilder
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.newScope
@@ -88,14 +88,14 @@ class DiffCommand(
 
                 progressBarBuilder.setInitialMax(pairs.size.toLong()).build().use { progressBar ->
                     runBlocking(coroutineContext) {
-                        pairs.pmap { (first, second) ->
+                        pairs.map { (first, second) ->
                             val res = compare(
                                 Image(first),
                                 Image(second),
                             )
                             progressBar.step()
                             res
-                        }
+                        }.asFlow()
                     }
                 }
             } else {
@@ -113,10 +113,13 @@ class DiffCommand(
             logger.info("Done")
         } catch (e: ImageDiffException) {
             logger.error(e.message)
+            e.printStackTrace(System.err)
         } catch (e: IOException) {
+            logger.error("An I/O error occurred: ${e.message}")
             e.printStackTrace(System.err)
         } catch (e: Exception) {
             logger.error("An unknown error occurred: ${e.message}")
+            e.printStackTrace(System.err)
         }
     }
 
@@ -165,12 +168,27 @@ class DiffCommand(
                     value.mapValues { (_, v) ->
                         // Truncate the value if it exceeds the maximum length
                         v.copy(
-                            cover = v.cover?.take(maxValueLen - 1)?.let { "$it…" },
-                            stego = v.stego?.take(maxValueLen - 1)?.let { "$it…" },
+                            cover = v.cover?.truncate(),
+                            stego = v.stego?.truncate(),
+                            diff = v.diff?.truncate(),
                         )
                     }
                 }
             )
+        }
+    }
+
+    private fun JsonElement?.truncate(): JsonElement? {
+        return when (this) {
+            is JsonPrimitive -> {
+                if (this.isString && this.content.length > maxValueLen) {
+                    JsonPrimitive(this.content.take(maxValueLen - 1).let { "$it…" })
+                } else this
+            }
+
+            is JsonObject -> JsonObject(mapValues { (_, value) -> value.truncate()!! })
+            is JsonArray -> JsonArray(map { it.truncate()!! })
+            else -> this
         }
     }
 
@@ -192,3 +210,4 @@ class DiffCommand(
             .reduce { acc, diff -> acc + diff }
     }
 }
+

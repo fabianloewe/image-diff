@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Truncate values">
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/PixelComparator.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,9 +46,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin Class" />
         <option value="Kotlin Interface" />
         <option value="Kotlin File" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -91,7 +95,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "stream-output",
+    "git-widget-placeholder": "pixel-comparator",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/fabianloewe/IdeaProjects/image-diff/test-data/StegoAppDB_stegos_20240207-014855",
     "node.js.detected.package.eslint": "true",
@@ -170,7 +174,7 @@
     <configuration name="MainKt (all)" type="JetRunConfigurationType">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
-      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Pmetadata.ignoreNulls=false" />
+      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Pmetadata.ignoreNulls=false -Ppixel.diffImageDir=test-data/diffs" />
       <shortenClasspath name="NONE" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
@@ -354,22 +358,17 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt</url>
-          <line>151</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt</url>
-          <line>147</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Statistics.kt</url>
           <line>21</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
           <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/PixelComparator.kt</url>
+          <line>89</line>
+          <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

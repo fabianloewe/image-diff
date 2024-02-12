@@ -2,6 +2,7 @@ package com.github.fabianloewe.imagediff
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.fabianloewe.imagediff.comparators.MetadataComparator
+import com.github.fabianloewe.imagediff.comparators.PixelComparator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import me.tongfei.progressbar.DelegatingProgressBarConsumer
@@ -25,7 +26,12 @@ class Main : KoinComponent {
 
 fun main(args: Array<String>) {
     val appModule = module {
-        single(named("comparators")) { mapOf(MetadataComparator.NAME to MetadataComparator()) }
+        single(named("comparators")) {
+            mapOf(
+                MetadataComparator.NAME to MetadataComparator(),
+                PixelComparator.NAME to PixelComparator()
+            )
+        }
 
         single { Dispatchers.Default } bind CoroutineContext::class
 

@@ -2,6 +2,7 @@ package com.github.fabianloewe.imagediff
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlinx.serialization.json.JsonElement
 import java.nio.file.Path
 import kotlin.io.path.nameWithoutExtension
 
@@ -10,7 +11,11 @@ import kotlin.io.path.nameWithoutExtension
 value class DiffKey(val value: String)
 
 @Serializable
-data class DiffValue(val cover: String?, val stego: String?)
+data class DiffValue(
+    val cover: JsonElement?,
+    val stego: JsonElement?,
+    val diff: JsonElement? = null
+)
 
 typealias ComparatorName = String
 
@@ -18,6 +23,10 @@ typealias Diff = Map<ComparatorName, Map<DiffKey, DiffValue>>
 
 @JvmInline
 value class Image(val path: Path)
+
+enum class ColorChannel {
+    R, G, B;
+}
 
 typealias DiffResultId = String
 

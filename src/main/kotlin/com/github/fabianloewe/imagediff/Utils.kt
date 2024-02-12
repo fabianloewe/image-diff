@@ -45,3 +45,7 @@ fun DiffResult.outputStream(baseDir: Path): OutputStream {
     val fileName = cover.path.name + '_' + stego.path.name + ".jpg"
     return (baseDir / fileName).outputStream()
 }
+
+fun String.toColorChannels(): Set<ColorChannel> {
+    return this.map { ColorChannel.valueOf(it.uppercase()) }.toSet()
+}
