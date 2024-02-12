@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Now also finding additional metadata in the stego image">
+    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Truncate values">
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageComparator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +51,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="metadata-added-by-stego" />
+        <entry key="$PROJECT_DIR$" value="truncate-value" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -59,9 +62,9 @@
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2bxZ6SAoeDBOQOgfoToj8lQBk7c" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -81,7 +84,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "cut-off-value",
+    "git-widget-placeholder": "flexible-comparator-params",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/fabianloewe/IdeaProjects/image-diff/test-data/StegoAppDB_stegos_20240207-014855",
     "node.js.detected.package.eslint": "true",
@@ -102,7 +105,7 @@
       <recent name="de.fabianloewe.imagediff" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt (-h)">
+  <component name="RunManager" selected="Kotlin.MainKt (all)">
     <configuration name="image-diff [jar]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -160,7 +163,7 @@
     <configuration name="MainKt (all)" type="JetRunConfigurationType">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
-      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv --no-ignore-nulls" />
+      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Pmetadata.ignoreNulls=false" />
       <shortenClasspath name="NONE" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
@@ -200,7 +203,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1707158515042</updated>
-      <workItem from="1707158516105" duration="30595000" />
+      <workItem from="1707158516105" duration="31298000" />
+      <workItem from="1707727744787" duration="2561000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -306,7 +310,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707396885911</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Truncate values">
+      <option name="closed" value="true" />
+      <created>1707399080541</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1707399080541</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,7 +338,8 @@
     <MESSAGE value="Lowered JVM target version" />
     <MESSAGE value="Implemented ignoring null values in diff" />
     <MESSAGE value="Now also finding additional metadata in the stego image" />
-    <option name="LAST_COMMIT_MESSAGE" value="Now also finding additional metadata in the stego image" />
+    <MESSAGE value="Truncate values" />
+    <option name="LAST_COMMIT_MESSAGE" value="Truncate values" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

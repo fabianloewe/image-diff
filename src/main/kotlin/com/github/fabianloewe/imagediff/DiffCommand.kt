@@ -65,9 +65,9 @@ class DiffCommand(
         .associate()
         .help("The case-sensitive filters to apply to the correspondences list (e.g. --filter column1=value1)")
 
-    private val ignoreNulls by option("--ignore-nulls")
-        .flag("--no-ignore-nulls", default = true)
-        .help("Whether to ignore null values for stego images in the diff output (default: true)")
+    private val comparatorsParams: Map<String, Any> by option("-P", "--comparator-param")
+        .associate()
+        .help("The parameters to pass to the comparators in the format comp1.param1=value")
 
     private val maxValueLen by option("-L", "--max-value-len")
         .int()
@@ -88,9 +88,8 @@ class DiffCommand(
                     runBlocking(coroutineContext) {
                         pairs.pmap { (first, second) ->
                             val res = compare(
-                                Image(first, first.inputStream()),
-                                Image(second, second.inputStream()),
-                                ignoreNulls
+                                Image(first),
+                                Image(second),
                             )
                             progressBar.step()
                             res
@@ -99,9 +98,8 @@ class DiffCommand(
                 }
             } else {
                 val diffRes = compare(
-                    Image(coverImagePath, coverImagePath.inputStream()),
-                    Image(stegoImagePath, stegoImagePath.inputStream()),
-                    ignoreNulls
+                    Image(coverImagePath),
+                    Image(stegoImagePath),
                 )
                 listOf(diffRes)
             }
@@ -112,7 +110,7 @@ class DiffCommand(
         } catch (e: ImageDiffException) {
             logger.error(e.message)
         } catch (e: IOException) {
-            logger.error("An I/O error occurred: ${e.cause?.message ?: e.message}")
+            e.printStackTrace(System.err)
         } catch (e: Exception) {
             logger.error("An unknown error occurred: ${e.message}")
         }
@@ -176,13 +174,17 @@ class DiffCommand(
      * Compare two images using the specified comparators.
      * @param first The first image to compare
      * @param second The second image to compare
-     * @param ignoreNulls Whether to ignore null values for stego images in the [DiffResult]
      * @return The [DiffResult] of the comparison
      */
-    private fun compare(first: Image, second: Image, ignoreNulls: Boolean): DiffResult {
+    private fun compare(first: Image, second: Image): DiffResult {
         return comparatorsNames
-            .mapNotNull { comparators[it] }
-            .map { it.compare(first, second, ignoreNulls) }
+            .mapNotNull { compName ->
+                val pair = comparators[compName] to comparatorsParams
+                    .filter { (k, _) -> k.startsWith("$compName.") }
+                    .mapKeys { (k, _) -> k.removePrefix("$compName.") }
+                pair.takeIf { it.first != null }
+            }
+            .map { (comp, args) -> comp!!.compare(first, second, args) }
             .reduce { acc, diff -> acc + diff }
     }
 }
