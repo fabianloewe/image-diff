@@ -5,6 +5,8 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -101,11 +103,13 @@ class DiffCommand(
                     Image(coverImagePath),
                     Image(stegoImagePath),
                 )
-                listOf(diffRes)
+                flowOf(diffRes)
             }
 
             logger.info("Writing output...")
-            writeOutput(diffResults)
+            runBlocking(coroutineContext) {
+                writeOutput(diffResults.toList())
+            }
             logger.info("Done")
         } catch (e: ImageDiffException) {
             logger.error(e.message)
@@ -136,7 +140,7 @@ class DiffCommand(
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    private fun writeOutput(diffResults: List<DiffResult>) {
+    private fun writeOutput(diffResults: Iterable<DiffResult>) {
         val statistics = Statistics(
             diffResults.computeRateOfChanges(),
             diffResults.computeChangesPerImage()
@@ -145,16 +149,16 @@ class DiffCommand(
         val optimizedDiffResults = diffResults.optimizeForOutput()
         if (splitOutput) {
             val dir = output.createDirectories()
-            for (diffRes in optimizedDiffResults) {
+            optimizedDiffResults.forEach { diffRes ->
                 json.encodeToStream(diffRes, diffRes.outputStream(dir))
             }
         } else {
-            val diffData = DiffData("1.0", System.currentTimeMillis(), statistics, optimizedDiffResults)
+            val diffData = DiffData("1.0", System.currentTimeMillis(), statistics, optimizedDiffResults.toList())
             json.encodeToStream(diffData, output.outputStream())
         }
     }
 
-    private fun List<DiffResult>.optimizeForOutput(): List<DiffResult> {
+    private fun Iterable<DiffResult>.optimizeForOutput(): List<DiffResult> {
         return map { diffRes ->
             diffRes.copy(
                 diff = diffRes.diff.mapValues { (_, value) ->
