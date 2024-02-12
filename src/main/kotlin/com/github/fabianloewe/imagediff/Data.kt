@@ -2,9 +2,7 @@ package com.github.fabianloewe.imagediff
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import java.io.InputStream
 import java.nio.file.Path
-import kotlin.io.path.inputStream
 import kotlin.io.path.nameWithoutExtension
 
 @Serializable
@@ -18,7 +16,8 @@ typealias ComparatorName = String
 
 typealias Diff = Map<ComparatorName, Map<DiffKey, DiffValue>>
 
-data class Image(val path: Path, @Transient val inputStream: InputStream = path.inputStream())
+@JvmInline
+value class Image(val path: Path)
 
 typealias DiffResultId = String
 

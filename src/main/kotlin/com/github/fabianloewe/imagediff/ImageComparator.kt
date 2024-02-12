@@ -1,5 +1,7 @@
 package com.github.fabianloewe.imagediff
 
+typealias ImageComparatorArgsMap = Map<String, Any>
+
 /**
  * Interface for comparing two images.
  */
@@ -9,8 +11,8 @@ interface ImageComparator {
      *
      * @param coverImage The cover image.
      * @param stegoImage The stego image.
-     * @param ignoreNulls Whether to ignore null values in the comparison (e.g. something was removed in the stego image).
+     * @param argsMap Additional arguments for the comparison.
      * @return The differences between the two images.
      */
-    fun compare(coverImage: Image, stegoImage: Image, ignoreNulls: Boolean): DiffResult
+    fun compare(coverImage: Image, stegoImage: Image, argsMap: ImageComparatorArgsMap): DiffResult
 }
