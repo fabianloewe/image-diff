@@ -1,7 +1,6 @@
 package com.github.fabianloewe.imagediff.comparators
 
 import com.github.fabianloewe.imagediff.*
-import com.sksamuel.scrimage.metadata.ImageMetadata
 import kotlinx.serialization.json.JsonPrimitive
 
 /**
@@ -60,8 +59,7 @@ class MetadataComparator : ImageComparator {
     }
 
     private fun extractMetadata(image: Image): Map<DiffKey, String> {
-        val metadata = ImageMetadata.fromPath(image.path)
-        return metadata.tags().associate { DiffKey(it.name) to it.value }
+        return image.data.metadata.tags().associate { DiffKey(it.name) to it.value }
     }
 
     companion object {

@@ -1,9 +1,11 @@
 package com.github.fabianloewe.imagediff
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.github.fabianloewe.imagediff.comparators.CompositeComparator
 import com.github.fabianloewe.imagediff.comparators.MetadataComparator
-import com.github.fabianloewe.imagediff.comparators.PixelComparator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import me.tongfei.progressbar.DelegatingProgressBarConsumer
 import me.tongfei.progressbar.ProgressBarBuilder
@@ -24,18 +26,28 @@ class Main : KoinComponent {
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalSerializationApi::class)
 fun main(args: Array<String>) {
     val appModule = module {
         single(named("comparators")) {
             mapOf(
                 MetadataComparator.NAME to MetadataComparator(),
-                PixelComparator.NAME to PixelComparator()
+                CompositeComparator.NAME to CompositeComparator()
             )
         }
 
-        single { Dispatchers.Default } bind CoroutineContext::class
+        single {
+            Dispatchers.IO.limitedParallelism(
+                Runtime.getRuntime().availableProcessors() * 2
+            )
+        } bind CoroutineContext::class
 
-        single { Json { prettyPrint = true } }
+        single {
+            Json {
+                prettyPrint = true
+                explicitNulls = false
+            }
+        }
 
         single { csvReader() }
 

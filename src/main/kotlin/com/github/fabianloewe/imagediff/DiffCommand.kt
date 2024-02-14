@@ -76,6 +76,10 @@ class DiffCommand(
         .default(100)
         .help("The maximum length of the value in the diff output (default: 100)")
 
+    private val parallel by option("--parallel")
+        .flag("--no-parallel", default = false)
+        .help("Whether to compare images in parallel. WARNING: This may consume a lot of memory and potentially crash the program. (default: false)")
+
     override fun run() {
         try {
             val diffResults = if (coverImagePath.isDirectory() && stegoImagePath.isDirectory()) {
@@ -87,15 +91,22 @@ class DiffCommand(
                 logger.info("Found ${pairs.size} pairs of images")
 
                 progressBarBuilder.setInitialMax(pairs.size.toLong()).build().use { progressBar ->
-                    runBlocking(coroutineContext) {
-                        pairs.map { (first, second) ->
-                            val res = compare(
-                                Image(first),
-                                Image(second),
-                            )
-                            progressBar.step()
-                            res
-                        }.asFlow()
+                    val doCompare = { (first, second): Pair<Path, Path> ->
+                        val res = compare(
+                            Image(first),
+                            Image(second),
+                        )
+                        progressBar.step()
+                        res
+                    }
+
+                    if (parallel) {
+                        logger.info("Comparing images in parallel...")
+                        runBlocking(coroutineContext) {
+                            pairs.pmap(doCompare)
+                        }
+                    } else {
+                        pairs.map(doCompare).asFlow()
                     }
                 }
             } else {
@@ -113,7 +124,6 @@ class DiffCommand(
             logger.info("Done")
         } catch (e: ImageDiffException) {
             logger.error(e.message)
-            e.printStackTrace(System.err)
         } catch (e: IOException) {
             logger.error("An I/O error occurred: ${e.message}")
             e.printStackTrace(System.err)

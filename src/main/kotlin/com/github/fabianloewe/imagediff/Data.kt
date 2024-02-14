@@ -1,8 +1,10 @@
 package com.github.fabianloewe.imagediff
 
+import com.sksamuel.scrimage.ImmutableImage
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonElement
+import java.awt.image.BufferedImage
 import java.nio.file.Path
 import kotlin.io.path.nameWithoutExtension
 
@@ -21,8 +23,11 @@ typealias ComparatorName = String
 
 typealias Diff = Map<ComparatorName, Map<DiffKey, DiffValue>>
 
-@JvmInline
-value class Image(val path: Path)
+data class Image(val path: Path, private val _data: ImmutableImage? = null) {
+    val data: ImmutableImage by lazy {
+        _data ?: ImmutableImage.loader().type(BufferedImage.TYPE_INT_ARGB).fromPath(path)
+    }
+}
 
 enum class ColorChannel {
     R, G, B;
