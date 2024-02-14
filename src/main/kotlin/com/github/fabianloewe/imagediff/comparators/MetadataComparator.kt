@@ -1,7 +1,7 @@
 package com.github.fabianloewe.imagediff.comparators
 
 import com.github.fabianloewe.imagediff.*
-import com.sksamuel.scrimage.metadata.ImageMetadata
+import kotlinx.serialization.json.JsonPrimitive
 
 /**
  * Compares the metadata of two images.
@@ -17,7 +17,13 @@ class MetadataComparator : ImageComparator {
             val DEFAULTS = mapOf("ignoreNulls" to true)
 
             operator fun invoke(args: ImageComparatorArgsMap): Args {
-                return Args(args + DEFAULTS)
+                val parsedArgs = args.mapValues { (key, value) ->
+                    when (key) {
+                        "ignoreNulls" -> value.toString().toBoolean()
+                        else -> throw IllegalArgumentException("Unknown argument: $key")
+                    }
+                }
+                return Args(DEFAULTS + parsedArgs)
             }
         }
     }
@@ -41,20 +47,19 @@ class MetadataComparator : ImageComparator {
                     }
                 }
             }
-            .mapValues { (key, value) -> DiffValue(value, stegoMetadata[key]) }
+            .mapValues { (key, value) -> DiffValue(JsonPrimitive(value), JsonPrimitive(stegoMetadata[key])) }
         val stegoMetadataDiff = stegoMetadata
             .filter { (key, value) ->
                 // Here we want to include null values in the cover image to show metadata that was added in the stego image
                 coverMetadata[key] != value
             }
-            .mapValues { (key, value) -> DiffValue(coverMetadata[key], value) }
+            .mapValues { (key, value) -> DiffValue(JsonPrimitive(coverMetadata[key]), JsonPrimitive(value)) }
         val metadataDiff = coverMetadataDiff + stegoMetadataDiff
         return DiffResult(coverImage, stegoImage, mapOf(NAME to metadataDiff))
     }
 
     private fun extractMetadata(image: Image): Map<DiffKey, String> {
-        val metadata = ImageMetadata.fromPath(image.path)
-        return metadata.tags().associate { DiffKey(it.name) to it.value }
+        return image.data.metadata.tags().associate { DiffKey(it.name) to it.value }
     }
 
     companion object {
