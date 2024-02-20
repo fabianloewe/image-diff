@@ -4,9 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Implemented ignoring null values in diff">
+    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="WIP with manual pixel comparison">
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/CompositeComparator.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Composite.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Preprocess.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Types.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Utils.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/PixelComparator.kt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +30,9 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
         <projects_view>
           <tree_state>
             <expand>
@@ -38,8 +50,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin Class" />
         <option value="Kotlin Interface" />
+        <option value="Kotlin Class" />
         <option value="Kotlin File" />
       </list>
     </option>
@@ -47,10 +59,17 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="ignore-nulls" />
+        <entry key="$PROJECT_DIR$" value="dev" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="main" />
+      </list>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -58,9 +77,9 @@
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2bxZ6SAoeDBOQOgfoToj8lQBk7c" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -74,13 +93,17 @@
     "Gradle.image-diff [jar].executor": "Run",
     "JAR Application.image-diff-0.1-SNAPSHOT.jar.executor": "Run",
     "Kotlin.MainKt (-h).executor": "Run",
+    "Kotlin.MainKt (MobiStego) (reduce over diff - stego).executor": "Run",
+    "Kotlin.MainKt (MobiStego) (reduce over diffs).executor": "Debug",
+    "Kotlin.MainKt (MobiStego) (reduce).executor": "Run",
+    "Kotlin.MainKt (MobiStego).executor": "Run",
     "Kotlin.MainKt (PixelKnot).executor": "Run",
     "Kotlin.MainKt (all).executor": "Run",
     "Kotlin.MainKt.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "metadata-added-by-stego",
+    "git-widget-placeholder": "pixel-comparator",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/fabianloewe/IdeaProjects/image-diff/test-data/StegoAppDB_stegos_20240207-014855",
     "node.js.detected.package.eslint": "true",
@@ -88,6 +111,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "database.data.views.appearance",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -96,11 +120,17 @@
       <recent name="$PROJECT_DIR$/test-data/StegoAppDB_stegos_20240207-014855" />
       <recent name="$PROJECT_DIR$/test-data/StegoAppDB_stegos_20240206-085323" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test-data/StegoAppDB_stegos_20240207-014855" />
+    </key>
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
       <recent name="de.fabianloewe.imagediff" />
     </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="com.github.fabianloewe.imagediff.comparators" />
+    </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt (all)">
+  <component name="RunManager" selected="Kotlin.MainKt (MobiStego) (reduce over diffs)">
     <configuration name="image-diff [jar]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -141,10 +171,38 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MainKt (MobiStego) (reduce over diffs)" type="JetRunConfigurationType">
+      <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
+      <module name="image-diff.main" />
+      <option name="PROGRAM_PARAMETERS" value="-c . -s . -o test-data/output-MobiStego-reduce.json -l test-data/MobiStego_diff_overlay.csv -Pcomposite.imageDir=test-data/StegoAppDB_stegos_20240207-014855/darken -Pcomposite.mode=reduce-stego -Pcomposite.composite=darken" />
+      <shortenClasspath name="NONE" />
+      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+        <option name="credential" />
+        <option name="region" />
+        <option name="useCurrentConnection" value="false" />
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainKt (MobiStego)" type="JetRunConfigurationType">
+      <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
+      <module name="image-diff.main" />
+      <option name="PROGRAM_PARAMETERS" value="--parallel -c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output-MobiStego.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Fembedding_method=MobiStego -Pcomposite.imageDir=test-data/StegoAppDB_stegos_20240207-014855/diffs" />
+      <shortenClasspath name="NONE" />
+      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+        <option name="credential" />
+        <option name="region" />
+        <option name="useCurrentConnection" value="false" />
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="MainKt (PixelKnot)" type="JetRunConfigurationType" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
-      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output-PixelKnot.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Fembedding_method=PixelKnot" />
+      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output-PixelKnot.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Fembedding_method=PixelKnot -Ppixel.diffImageDir=test-data/StegoAppDB_stegos_20240207-014855/diffs" />
       <shortenClasspath name="NONE" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
@@ -158,7 +216,7 @@
     <configuration name="MainKt (all)" type="JetRunConfigurationType">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
-      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv --no-ignore-nulls" />
+      <option name="PROGRAM_PARAMETERS" value="-c test-data/StegoAppDB_stegos_20240207-014855/covers -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output.json -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Pmetadata.ignoreNulls=false -Ppixel.diffImageDir=test-data/diffs" />
       <shortenClasspath name="NONE" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
@@ -174,6 +232,8 @@
       <item itemvalue="JAR Application.image-diff-0.1-SNAPSHOT.jar" />
       <item itemvalue="Kotlin.MainKt (-h)" />
       <item itemvalue="Kotlin.MainKt (all)" />
+      <item itemvalue="Kotlin.MainKt (MobiStego)" />
+      <item itemvalue="Kotlin.MainKt (MobiStego) (reduce over diffs)" />
       <item itemvalue="Kotlin.MainKt (PixelKnot)" />
     </list>
     <recent_temporary>
@@ -198,7 +258,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1707158515042</updated>
-      <workItem from="1707158516105" duration="28562000" />
+      <workItem from="1707158516105" duration="31298000" />
+      <workItem from="1707727744787" duration="2561000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -296,7 +357,31 @@
       <option name="project" value="LOCAL" />
       <updated>1707393934303</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Now also finding additional metadata in the stego image">
+      <option name="closed" value="true" />
+      <created>1707396885911</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1707396885911</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Truncate values">
+      <option name="closed" value="true" />
+      <created>1707399080541</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1707399080541</updated>
+    </task>
+    <task id="LOCAL-00015" summary="WIP with manual pixel comparison">
+      <option name="closed" value="true" />
+      <created>1707759054195</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1707759054195</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -315,7 +400,10 @@
     <MESSAGE value="Re-added permissions on release job" />
     <MESSAGE value="Lowered JVM target version" />
     <MESSAGE value="Implemented ignoring null values in diff" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented ignoring null values in diff" />
+    <MESSAGE value="Now also finding additional metadata in the stego image" />
+    <MESSAGE value="Truncate values" />
+    <MESSAGE value="WIP with manual pixel comparison" />
+    <option name="LAST_COMMIT_MESSAGE" value="WIP with manual pixel comparison" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

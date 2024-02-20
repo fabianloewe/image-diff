@@ -1,10 +1,11 @@
 package com.github.fabianloewe.imagediff
 
+import com.sksamuel.scrimage.ImmutableImage
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import java.io.InputStream
+import kotlinx.serialization.json.JsonElement
+import java.awt.image.BufferedImage
 import java.nio.file.Path
-import kotlin.io.path.inputStream
 import kotlin.io.path.nameWithoutExtension
 
 @Serializable
@@ -12,18 +13,30 @@ import kotlin.io.path.nameWithoutExtension
 value class DiffKey(val value: String)
 
 @Serializable
-data class DiffValue(val cover: String?, val stego: String?)
+data class DiffValue(
+    val cover: JsonElement?,
+    val stego: JsonElement?,
+    val diff: JsonElement? = null
+)
 
 typealias ComparatorName = String
 
 typealias Diff = Map<ComparatorName, Map<DiffKey, DiffValue>>
 
-data class Image(val path: Path, @Transient val inputStream: InputStream = path.inputStream())
+data class Image(val path: Path, private val _data: ImmutableImage? = null) {
+    val data: ImmutableImage by lazy {
+        _data ?: ImmutableImage.loader().type(BufferedImage.TYPE_INT_ARGB).fromPath(path)
+    }
+}
+
+enum class ColorChannel {
+    R, G, B;
+}
 
 typealias DiffResultId = String
 
 @Serializable
-class DiffResult(val id: String, val coverPath: String, val stegoPath: String, val diff: Diff) {
+data class DiffResult(val id: String, val coverPath: String, val stegoPath: String, val diff: Diff) {
     constructor(cover: Image, stego: Image, diff: Diff) : this(
         cover.path.nameWithoutExtension + "_" + stego.path.nameWithoutExtension,
         cover.path.toString(),

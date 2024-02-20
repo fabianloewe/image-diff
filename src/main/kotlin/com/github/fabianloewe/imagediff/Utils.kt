@@ -1,8 +1,10 @@
 package com.github.fabianloewe.imagediff
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
 import org.koin.core.component.KoinScopeComponent
 import java.io.OutputStream
 import java.nio.file.Path
@@ -17,8 +19,8 @@ fun Path.gatherFiles() = when {
     else -> throw IllegalArgumentException("Path is not a file or directory")
 }
 
-suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-    map { async { f(it) } }.awaitAll()
+suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): Flow<B> = coroutineScope {
+    map { async { f(it) } }.asFlow().map { it.await() }
 }
 
 operator fun DiffResult.plus(other: DiffResult): DiffResult {
@@ -42,4 +44,8 @@ operator fun DiffResult.plus(other: DiffResult): DiffResult {
 fun DiffResult.outputStream(baseDir: Path): OutputStream {
     val fileName = cover.path.name + '_' + stego.path.name + ".jpg"
     return (baseDir / fileName).outputStream()
+}
+
+fun String.toColorChannels(): Set<ColorChannel> {
+    return this.map { ColorChannel.valueOf(it.uppercase()) }.toSet()
 }

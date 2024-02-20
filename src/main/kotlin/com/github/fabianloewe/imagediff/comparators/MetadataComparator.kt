@@ -1,45 +1,65 @@
 package com.github.fabianloewe.imagediff.comparators
 
 import com.github.fabianloewe.imagediff.*
-import com.sksamuel.scrimage.metadata.ImageMetadata
-import java.io.InputStream
+import kotlinx.serialization.json.JsonPrimitive
 
 /**
  * Compares the metadata of two images.
  */
 class MetadataComparator : ImageComparator {
+    private class Args private constructor(args: ImageComparatorArgsMap) {
+        /**
+         * Whether to ignore null values in the stego image.
+         */
+        val ignoreNulls: Boolean by args
+
+        companion object {
+            val DEFAULTS = mapOf("ignoreNulls" to true)
+
+            operator fun invoke(args: ImageComparatorArgsMap): Args {
+                val parsedArgs = args.mapValues { (key, value) ->
+                    when (key) {
+                        "ignoreNulls" -> value.toString().toBoolean()
+                        else -> throw IllegalArgumentException("Unknown argument: $key")
+                    }
+                }
+                return Args(DEFAULTS + parsedArgs)
+            }
+        }
+    }
+
     /**
      * Compares the metadata of two images.
      * @see ImageComparator.compare
      */
-    override fun compare(coverImage: Image, stegoImage: Image, ignoreNulls: Boolean): DiffResult {
-        val coverMetadata = extractMetadata(coverImage.inputStream)
-        val stegoMetadata = extractMetadata(stegoImage.inputStream)
+    override fun compare(coverImage: Image, stegoImage: Image, argsMap: ImageComparatorArgsMap): DiffResult {
+        val args = Args(argsMap)
+        val coverMetadata = extractMetadata(coverImage)
+        val stegoMetadata = extractMetadata(stegoImage)
 
         val coverMetadataDiff = coverMetadata
             .filter { (key, coverValue) ->
                 stegoMetadata[key].let { stegoValue ->
-                    if (ignoreNulls && stegoValue == null) {
+                    if (args.ignoreNulls && stegoValue == null) {
                         false
                     } else {
                         coverValue != stegoValue
                     }
                 }
             }
-            .mapValues { (key, value) -> DiffValue(value, stegoMetadata[key]) }
+            .mapValues { (key, value) -> DiffValue(JsonPrimitive(value), JsonPrimitive(stegoMetadata[key])) }
         val stegoMetadataDiff = stegoMetadata
             .filter { (key, value) ->
                 // Here we want to include null values in the cover image to show metadata that was added in the stego image
                 coverMetadata[key] != value
             }
-            .mapValues { (key, value) -> DiffValue(coverMetadata[key], value) }
+            .mapValues { (key, value) -> DiffValue(JsonPrimitive(coverMetadata[key]), JsonPrimitive(value)) }
         val metadataDiff = coverMetadataDiff + stegoMetadataDiff
         return DiffResult(coverImage, stegoImage, mapOf(NAME to metadataDiff))
     }
 
-    private fun extractMetadata(inputStream: InputStream): Map<DiffKey, String> {
-        val metadata = ImageMetadata.fromStream(inputStream)
-        return metadata.tags().associate { DiffKey(it.name) to it.value }
+    private fun extractMetadata(image: Image): Map<DiffKey, String> {
+        return image.data.metadata.tags().associate { DiffKey(it.name) to it.value }
     }
 
     companion object {
