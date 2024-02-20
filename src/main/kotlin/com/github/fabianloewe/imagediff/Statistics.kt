@@ -22,6 +22,6 @@ fun Iterable<DiffResult>.computeRateOfChanges(): Map<String, Map<DiffKey, Float>
     return totalChangesPerKey.mapValues { (_, map) ->
         map.mapValues { (_, count) ->
             count / size
-        }
-    }
+        }.toSortedMap()
+    }.toSortedMap()
 }

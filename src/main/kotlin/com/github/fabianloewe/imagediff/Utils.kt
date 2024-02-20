@@ -14,9 +14,13 @@ val <T : KoinScopeComponent> T.logger get() = scope.logger
 
 @OptIn(ExperimentalPathApi::class)
 fun Path.gatherFiles() = when {
-    isDirectory() -> walk().filter { it.isRegularFile() }.toList()
-    isRegularFile() -> listOf(this)
+    isDirectory() -> walk().filter { it.isRegularFile() }
+    isRegularFile() -> sequenceOf(this)
     else -> throw IllegalArgumentException("Path is not a file or directory")
+}
+
+suspend fun <A, B> Sequence<A>.pmap(f: suspend (A) -> B): Flow<B> = coroutineScope {
+    map { async { f(it) } }.asFlow().map { it.await() }
 }
 
 suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): Flow<B> = coroutineScope {
@@ -44,8 +48,4 @@ operator fun DiffResult.plus(other: DiffResult): DiffResult {
 fun DiffResult.outputStream(baseDir: Path): OutputStream {
     val fileName = cover.path.name + '_' + stego.path.name + ".jpg"
     return (baseDir / fileName).outputStream()
-}
-
-fun String.toColorChannels(): Set<ColorChannel> {
-    return this.map { ColorChannel.valueOf(it.uppercase()) }.toSet()
 }

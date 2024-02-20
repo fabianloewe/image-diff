@@ -10,13 +10,17 @@ import kotlin.io.path.nameWithoutExtension
 
 @Serializable
 @JvmInline
-value class DiffKey(val value: String)
+value class DiffKey(private val value: String) : Comparable<DiffKey> {
+    override fun compareTo(other: DiffKey): Int {
+        return value.compareTo(other.value)
+    }
+}
 
 @Serializable
 data class DiffValue(
     val cover: JsonElement?,
     val stego: JsonElement?,
-    val diff: JsonElement? = null
+    val diffv: JsonElement? = null
 )
 
 typealias ComparatorName = String
@@ -27,10 +31,6 @@ data class Image(val path: Path, private val _data: ImmutableImage? = null) {
     val data: ImmutableImage by lazy {
         _data ?: ImmutableImage.loader().type(BufferedImage.TYPE_INT_ARGB).fromPath(path)
     }
-}
-
-enum class ColorChannel {
-    R, G, B;
 }
 
 typealias DiffResultId = String
@@ -70,3 +70,6 @@ data class Statistics(
     @Transient
     val totalImages: Int = changesPerImage.size
 }
+
+typealias ExtractedData = Map<String, ByteArray>
+

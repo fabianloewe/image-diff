@@ -8,3 +8,12 @@ abstract class ImageDiffException(
 class MalformedCorrespondenceListException(
     missingColumn: String,
 ) : ImageDiffException("The correspondence list is malformed. The following column is missing: $missingColumn")
+
+abstract class ImageExtractorException(
+    override val message: String,
+    cause: Throwable? = null,
+) : ImageDiffException(message, cause)
+
+class UnknownImageExtractorException(
+    extractorName: String,
+) : ImageExtractorException("The image extractor '$extractorName' is unknown")
