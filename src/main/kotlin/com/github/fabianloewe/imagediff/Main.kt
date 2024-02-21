@@ -1,8 +1,13 @@
 package com.github.fabianloewe.imagediff
 
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.subcommands
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.github.fabianloewe.imagediff.commands.Diff
+import com.github.fabianloewe.imagediff.commands.Extract
 import com.github.fabianloewe.imagediff.comparators.CompositeComparator
 import com.github.fabianloewe.imagediff.comparators.MetadataComparator
+import com.github.fabianloewe.imagediff.extractors.LeastSignificantBitsExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -18,11 +23,14 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import kotlin.coroutines.CoroutineContext
 
-class Main : KoinComponent {
-    private val diffCmd: DiffCommand by inject()
+class Main : CliktCommand(name = "image-diff"), KoinComponent {
+    private val diffCmd: Diff by inject()
+    private val extractCmd: Extract by inject()
 
-    fun main(args: Array<String>) {
-        diffCmd.main(args)
+    override fun run() = Unit
+
+    fun run(args: Array<String>) {
+        subcommands(diffCmd, extractCmd).main(args)
     }
 }
 
@@ -32,7 +40,13 @@ fun main(args: Array<String>) {
         single(named("comparators")) {
             mapOf(
                 MetadataComparator.NAME to MetadataComparator(),
-                CompositeComparator.NAME to CompositeComparator()
+                CompositeComparator.NAME to CompositeComparator(),
+            )
+        }
+
+        single(named("extractors")) {
+            mapOf(
+                LeastSignificantBitsExtractor.NAME to LeastSignificantBitsExtractor()
             )
         }
 
@@ -57,13 +71,15 @@ fun main(args: Array<String>) {
                 .setConsumer(DelegatingProgressBarConsumer(logger::info))
         }
 
-        single { DiffCommand(get(named("comparators")), get(), get(), get(), get()) }
+        single { Diff(get(named("comparators"))) }
+
+        single { Extract(get(named("extractors"))) }
     }
     startKoin {
         printLogger(Level.INFO)
 
         modules(appModule)
 
-        Main().main(args)
+        Main().run(args)
     }
 }

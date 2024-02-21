@@ -1,10 +1,11 @@
-package com.github.fabianloewe.imagediff
+package com.github.fabianloewe.imagediff.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
+import com.github.fabianloewe.imagediff.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -13,6 +14,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 import me.tongfei.progressbar.ProgressBarBuilder
 import org.koin.core.component.KoinScopeComponent
+import org.koin.core.component.inject
 import org.koin.core.component.newScope
 import org.koin.core.scope.Scope
 import java.io.IOException
@@ -20,14 +22,16 @@ import java.nio.file.Path
 import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.*
 
-class DiffCommand(
+class Diff(
     private val comparators: Map<String, ImageComparator>,
-    private val coroutineContext: CoroutineContext,
-    private val json: Json,
-    private val csvReader: CsvReader,
-    private val progressBarBuilder: ProgressBarBuilder,
+
 ) : CliktCommand(), KoinScopeComponent {
     override val scope: Scope by newScope()
+
+    private val progressBarBuilder: ProgressBarBuilder by inject()
+    private val coroutineContext: CoroutineContext by inject()
+    private val json: Json by inject()
+    private val csvReader: CsvReader by inject()
 
     private val coverImagePath by option("-c", "--cover")
         .path()
@@ -80,6 +84,10 @@ class DiffCommand(
         .flag("--no-parallel", default = false)
         .help("Whether to compare images in parallel. WARNING: This may consume a lot of memory and potentially crash the program. (default: false)")
 
+    private val truncate by option("--truncate")
+        .flag("--no-truncate", default = true)
+        .help("Whether to truncate the diff values in the output to the maximum length (default: true)")
+
     override fun run() {
         try {
             val diffResults = if (coverImagePath.isDirectory() && stegoImagePath.isDirectory()) {
@@ -87,7 +95,7 @@ class DiffCommand(
                 val stegoImages = stegoImagePath.gatherFiles()
 
                 logger.info("Creating pairs of images to compare...")
-                val pairs = createPairs(coverImages, stegoImages)
+                val pairs = createPairs(coverImages, stegoImages).toList()
                 logger.info("Found ${pairs.size} pairs of images")
 
                 progressBarBuilder.setInitialMax(pairs.size.toLong()).build().use { progressBar ->
@@ -133,9 +141,10 @@ class DiffCommand(
         }
     }
 
-    private fun createPairs(coverImages: List<Path>, stegoImages: List<Path>): List<Pair<Path, Path>> {
+    private fun createPairs(coverImages: Sequence<Path>, stegoImages: Sequence<Path>): Sequence<Pair<Path, Path>> {
         return corListPath?.inputStream()?.let { csvInputStream ->
             csvReader.readAllWithHeader(csvInputStream)
+                .asSequence()
                 .filter { map ->
                     filters.all { (key, value) -> map[key] == value }
                 }
@@ -172,16 +181,23 @@ class DiffCommand(
     }
 
     private fun Iterable<DiffResult>.optimizeForOutput(): List<DiffResult> {
+        // Skip optimization if none of the flags are set
+        if (!truncate) return toList()
+
         return map { diffRes ->
             diffRes.copy(
-                diff = diffRes.diff.mapValues { (_, value) ->
-                    value.mapValues { (_, v) ->
-                        // Truncate the value if it exceeds the maximum length
-                        v.copy(
-                            cover = v.cover?.truncate(),
-                            stego = v.stego?.truncate(),
-                            diff = v.diff?.truncate(),
-                        )
+                diff = diffRes.diff.mapValues { (_, diffValueMap) ->
+                    diffValueMap.mapValues { (_, value) ->
+                        var newValue = value
+                        // This is used here to allow for easy addition of further optimizations in the future
+                        if (truncate) {
+                            newValue = newValue.copy(
+                                cover = newValue.cover?.truncate(),
+                                stego = newValue.stego?.truncate(),
+                                diffv = newValue.diffv?.truncate(),
+                            )
+                        }
+                        newValue
                     }
                 }
             )

@@ -4,18 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="WIP with manual pixel comparison">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/CompositeComparator.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Composite.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Preprocess.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Types.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/composite/Utils.kt" afterDir="false" />
+    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Made use of composites">
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageExtractor.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/commands/Extract.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/LeastSignificantBitsExtractor.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/lsb/BitsOperation.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/lsb/Types.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/lsb/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Data.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/DiffCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/commands/Diff.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Exceptions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Exceptions.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/PixelComparator.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Statistics.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Statistics.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,9 +54,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Kotlin File" />
         <option value="Kotlin Interface" />
         <option value="Kotlin Class" />
-        <option value="Kotlin File" />
       </list>
     </option>
   </component>
@@ -93,8 +97,9 @@
     "Gradle.image-diff [jar].executor": "Run",
     "JAR Application.image-diff-0.1-SNAPSHOT.jar.executor": "Run",
     "Kotlin.MainKt (-h).executor": "Run",
+    "Kotlin.MainKt (MobiStego) (extract).executor": "Run",
     "Kotlin.MainKt (MobiStego) (reduce over diff - stego).executor": "Run",
-    "Kotlin.MainKt (MobiStego) (reduce over diffs).executor": "Debug",
+    "Kotlin.MainKt (MobiStego) (reduce over diffs).executor": "Run",
     "Kotlin.MainKt (MobiStego) (reduce).executor": "Run",
     "Kotlin.MainKt (MobiStego).executor": "Run",
     "Kotlin.MainKt (PixelKnot).executor": "Run",
@@ -103,7 +108,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "pixel-comparator",
+    "git-widget-placeholder": "lsb-extractor",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/fabianloewe/IdeaProjects/image-diff/test-data/StegoAppDB_stegos_20240207-014855",
     "node.js.detected.package.eslint": "true",
@@ -121,16 +126,20 @@
       <recent name="$PROJECT_DIR$/test-data/StegoAppDB_stegos_20240206-085323" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/lsb" />
       <recent name="$PROJECT_DIR$/test-data/StegoAppDB_stegos_20240207-014855" />
     </key>
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="com.github.fabianloewe.imagediff.commands" />
+      <recent name="com.github.fabianloewe.imagediff.extractors" />
+      <recent name="com.github.fabianloewe.imagediff" />
       <recent name="de.fabianloewe.imagediff" />
     </key>
     <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
       <recent name="com.github.fabianloewe.imagediff.comparators" />
     </key>
   </component>
-  <component name="RunManager" selected="Kotlin.MainKt (MobiStego) (reduce over diffs)">
+  <component name="RunManager" selected="Kotlin.MainKt (MobiStego) (extract)">
     <configuration name="image-diff [jar]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -160,7 +169,21 @@
     <configuration name="MainKt (-h)" type="JetRunConfigurationType">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
-      <option name="PROGRAM_PARAMETERS" value="-h" />
+      <option name="PROGRAM_PARAMETERS" value="extract -h" />
+      <shortenClasspath name="NONE" />
+      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+        <option name="credential" />
+        <option name="region" />
+        <option name="useCurrentConnection" value="false" />
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainKt (MobiStego) (extract)" type="JetRunConfigurationType">
+      <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
+      <module name="image-diff.main" />
+      <option name="PROGRAM_PARAMETERS" value="extract -s test-data/StegoAppDB_stegos_20240207-014855/stegos -o test-data/output-MobiStego-extract -l test-data/StegoAppDB_stegos_20240207-014855/StegoAppDB.csv -Fembedding_method=MobiStego -Plsb.bitsPerChannel=2" />
       <shortenClasspath name="NONE" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
@@ -174,7 +197,7 @@
     <configuration name="MainKt (MobiStego) (reduce over diffs)" type="JetRunConfigurationType">
       <option name="MAIN_CLASS_NAME" value="com.github.fabianloewe.imagediff.MainKt" />
       <module name="image-diff.main" />
-      <option name="PROGRAM_PARAMETERS" value="-c . -s . -o test-data/output-MobiStego-reduce.json -l test-data/MobiStego_diff_overlay.csv -Pcomposite.imageDir=test-data/StegoAppDB_stegos_20240207-014855/darken -Pcomposite.mode=reduce-stego -Pcomposite.composite=darken" />
+      <option name="PROGRAM_PARAMETERS" value="diff --no-truncate -c . -s . -o test-data/output-MobiStego-reduce.json -l test-data/MobiStego_diff_overlay.csv -Pcomposite.imageDir=test-data/StegoAppDB_stegos_20240207-014855/darken -Pcomposite.mode=reduce-stego -Pcomposite.composite=darken -PpixelBits.bitsPerChannel=2 -PpixelBits.detailed=false -PpixelBits.operation=and" />
       <shortenClasspath name="NONE" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
@@ -233,6 +256,7 @@
       <item itemvalue="Kotlin.MainKt (-h)" />
       <item itemvalue="Kotlin.MainKt (all)" />
       <item itemvalue="Kotlin.MainKt (MobiStego)" />
+      <item itemvalue="Kotlin.MainKt (MobiStego) (extract)" />
       <item itemvalue="Kotlin.MainKt (MobiStego) (reduce over diffs)" />
       <item itemvalue="Kotlin.MainKt (PixelKnot)" />
     </list>
@@ -260,6 +284,7 @@
       <updated>1707158515042</updated>
       <workItem from="1707158516105" duration="31298000" />
       <workItem from="1707727744787" duration="2561000" />
+      <workItem from="1708423367218" duration="12091000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
