@@ -1,12 +1,11 @@
 package com.github.fabianloewe.imagediff
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import me.tongfei.progressbar.ProgressBar
 import org.koin.core.component.KoinScopeComponent
-import java.io.OutputStream
+import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -19,14 +18,40 @@ fun Path.gatherFiles() = when {
     else -> throw IllegalArgumentException("Path is not a file or directory")
 }
 
-suspend fun <A, B> Sequence<A>.pmap(f: suspend (A) -> B): Flow<B> = coroutineScope {
-    map { async { f(it) } }.asFlow().map { it.await() }
+suspend fun <A, B> Sequence<A>.pmap(f: suspend (A) -> B): Flow<B> = callbackFlow {
+    toList().map {
+        launch {
+            send(f(it))
+        }
+    }.joinAll()
+    close()
+}.buffer()
+
+fun <T> Flow<T>.withProgressBar(
+    progressBar: ProgressBar
+): Flow<T> {
+    return onEach { progressBar.step() }
+        .onCompletion { progressBar.close() }
 }
 
-suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): Flow<B> = coroutineScope {
-    map { async { f(it) } }.asFlow().map { it.await() }
+fun nameResultFileName(image: Image, extension: String): String {
+    val imageName = image.path.name.replace('.', '_')
+    return "$imageName.$extension"
 }
 
+
+fun nameResultFileName(coverImage: Image, stegoImage: Image, extension: String): String {
+    val coverName = coverImage.path.name
+    val stegoName = stegoImage.path.name
+    val resultFileName = "${coverName}__${stegoName}".replace('.', '_')
+    return "$resultFileName.$extension"
+}
+
+fun ByteArray.outputStream(): ByteArrayOutputStream {
+    return ByteArrayOutputStream().also { it.write(this) }
+}
+
+/*
 operator fun DiffResult.plus(other: DiffResult): DiffResult {
     if (this.cover != other.cover || this.stego != other.stego) {
         throw IllegalArgumentException("Images do not match")
@@ -39,13 +64,17 @@ operator fun DiffResult.plus(other: DiffResult): DiffResult {
     return DiffResult(cover, stego, diff = diff)
 }
 
-/**
- * Get the output stream to the output file corresponding to this [DiffResult].
- * @receiver The [DiffResult] to write to a JSON file
- * @param baseDir The base directory to write to
- * @return The output stream
+private fun JsonElement?.truncate(): JsonElement? {
+        return when (this) {
+            is JsonPrimitive -> {
+                if (this.isString && this.content.length > maxValueLen) {
+                    JsonPrimitive(this.content.take(maxValueLen - 1).let { "$it…" })
+                } else this
+            }
+
+            is JsonObject -> JsonObject(mapValues { (_, value) -> value.truncate()!! })
+            is JsonArray -> JsonArray(map { it.truncate()!! })
+            else -> this
+        }
+    }
  */
-fun DiffResult.outputStream(baseDir: Path): OutputStream {
-    val fileName = cover.path.name + '_' + stego.path.name + ".jpg"
-    return (baseDir / fileName).outputStream()
-}

@@ -1,11 +1,17 @@
 package com.github.fabianloewe.imagediff.comparators
 
-import com.github.fabianloewe.imagediff.*
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.fabianloewe.imagediff.Image
+import com.github.fabianloewe.imagediff.ImageComparator
+import com.github.fabianloewe.imagediff.ImageComparatorArgs
+import com.github.fabianloewe.imagediff.ImageComparisonData
 import com.github.fabianloewe.imagediff.comparators.composite.*
+import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.JpegWriter
 import com.sksamuel.scrimage.nio.PngWriter
-import com.sksamuel.scrimage.pixels.Pixel
-import kotlinx.serialization.json.JsonPrimitive
+import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.io.path.Path
@@ -27,81 +33,62 @@ import kotlin.io.path.nameWithoutExtension
 class CompositeComparator : ImageComparator {
     private val previousImageRef: AtomicReference<Image?> = AtomicReference()
 
-    private class Args private constructor(args: ImageComparatorArgsMap) {
-        val imageDir: String by args
-        val composite: CompositeType by args
-        val preprocess: ImagePreprocessing by args
-        val mode: ImageSequenceCompositingMode by args
+    inner class Args : ImageComparatorArgs(this) {
+        private val imageDirOption = option(
+            "--image-dir",
+            help = "The directory to save the composite images to."
+        ).default("output/composites")
 
-        companion object {
-            val DEFAULTS = mapOf(
-                "imageDir" to "output/composites",
-                "composite" to CompositeType.DIFF,
-                "preprocess" to ImagePreprocessing.NONE,
-                "mode" to ImageSequenceCompositingMode.NORMAL
-            )
+        val imageDir: String by imageDirOption
 
-            operator fun invoke(args: ImageComparatorArgsMap): Args {
-                val parsedArgs = args.mapValues { (key, value) ->
-                    when (key) {
-                        "imageDir" -> value.toString()
-                        "composite" -> value.toString().toCompositeType()
-                        "preprocess" -> value.toString().toImagePreprocessing()
-                        "mode" -> value.toString().toImageSequenceCompositingMode()
-                        else -> throw IllegalArgumentException("Unknown argument: $key")
-                    }
-                }
-                return Args(DEFAULTS + parsedArgs)
-            }
-        }
+        private val compositeOption = option(
+            "--composite",
+            help = "The type of compositing to use."
+        ).convert { it.toCompositeType() }.default(CompositeType.DIFF)
+
+        val composite: CompositeType by compositeOption
+
+        private val preprocessOption = option(
+            "--preprocess",
+            help = "A preprocessing operation to apply to the images before compositing them."
+        ).convert { it.toImagePreprocessing() }.default(ImagePreprocessing.NONE)
+
+        val preprocess: ImagePreprocessing by preprocessOption
+
+        private val modeOption = option(
+            "--mode",
+            help = "The mode for applying the compositing operation."
+        ).convert { it.toImageSequenceCompositingMode() }.default(ImageSequenceCompositingMode.NORMAL)
+
+        val mode: ImageSequenceCompositingMode by modeOption
+
+        override val all = listOf(imageDirOption, compositeOption, preprocessOption, modeOption)
     }
 
-    override fun compare(coverImage: Image, stegoImage: Image, argsMap: ImageComparatorArgsMap): DiffResult {
-        val args = Args(argsMap)
+    /**
+     * The options for the composite comparator.
+     */
+    override val args by lazy { Args() }
 
+    override fun compare(coverImage: Image, stegoImage: Image): Result<ImageComparisonData> {
         val (prepCoverImage, prepStegoImage) = args.preprocess(coverImage, stegoImage)
 
         val diffImage = when (args.mode) {
-            ImageSequenceCompositingMode.NORMAL -> args.composite(prepCoverImage, prepStegoImage).copy(
-                path = Path(args.imageDir) / args.diffImageName(prepCoverImage, prepStegoImage)
-            )
-
-            ImageSequenceCompositingMode.REDUCE_COVER -> {
-                val previousImage = previousImageRef.get() ?: prepStegoImage
-                val newImage = args.composite(previousImage, prepCoverImage).copy(
-                    path = Path(args.imageDir) / args.diffImageName(previousImage, prepCoverImage),
-                )
-                previousImageRef.set(newImage)
-                newImage
-            }
-
-            ImageSequenceCompositingMode.REDUCE_STEGO -> {
-                val previousImage = previousImageRef.get() ?: prepCoverImage
-                val newImage = args.composite(previousImage, prepStegoImage).copy(
-                    path = Path(args.imageDir) / args.diffImageName(previousImage, prepStegoImage),
-                )
-                previousImageRef.set(newImage)
-                newImage
-            }
+            ImageSequenceCompositingMode.NORMAL -> composeNormal(prepCoverImage, prepStegoImage)
+            ImageSequenceCompositingMode.REDUCE_COVER -> composeByReduceCover(prepCoverImage, prepStegoImage)
+            ImageSequenceCompositingMode.REDUCE_STEGO -> composeByReduceStego(prepStegoImage, prepCoverImage)
         }
 
-        val writer = if (coverImage.path.extension == "png") PngWriter() else JpegWriter()
-        diffImage.data.output(writer, diffImage.path)
-
-        val diffStartPixel = diffImage.data.pixels().firstOrNull(Pixel::isNotBlack)?.let(Pixel::toJsonArray)
-        val diffEndPixel = diffImage.data.pixels().lastOrNull(Pixel::isNotBlack)?.let(Pixel::toJsonArray)
-        val diffValues = mapOf(
-            DiffKey("Composite Type") to DiffValue(null, null, JsonPrimitive(args.composite.name.lowercase())),
-            DiffKey("Composite Path") to DiffValue(null, null, JsonPrimitive(diffImage.path.toString())),
-            DiffKey("Composite Start Pixel") to DiffValue(null, null, diffStartPixel),
-            DiffKey("Composite End Pixel") to DiffValue(null, null, diffEndPixel),
-        )
-
-        return DiffResult(
+        val fileType = diffImage.data.metadata.tagsBy { it.name == "Format" }.firstOrNull()?.value
+        val outputStream = diffImage.data.outputStream(fileType ?: "unknown")
+        val comparisonData = ImageComparisonData(
+            this,
             coverImage,
             stegoImage,
-            mapOf(NAME to diffValues)
+            outputStream,
+            fileType ?: "img"
         )
+        return Result.success(comparisonData)
     }
 
     private fun Args.diffImageName(cover: Image, stego: Image): String {
@@ -127,7 +114,43 @@ class CompositeComparator : ImageComparator {
         }
     }
 
+    private fun composeNormal(cover: Image, stego: Image): Image {
+        return args.composite(cover, stego).copy(
+            path = Path(args.imageDir) / args.diffImageName(cover, stego)
+        )
+    }
+
+    private fun composeByReduceCover(cover: Image, stego: Image): Image {
+        val previousImage = previousImageRef.get() ?: stego
+        val newImage = args.composite(previousImage, cover).copy(
+            path = Path(args.imageDir) / args.diffImageName(previousImage, cover),
+        )
+        previousImageRef.set(newImage)
+        return newImage
+    }
+
+    private fun composeByReduceStego(stego: Image, cover: Image): Image {
+        val previousImage = previousImageRef.get() ?: cover
+        val newImage = args.composite(previousImage, stego).copy(
+            path = Path(args.imageDir) / args.diffImageName(previousImage, stego),
+        )
+        previousImageRef.set(newImage)
+        return newImage
+    }
+
     companion object {
         const val NAME = "composite"
     }
+}
+
+private fun ImmutableImage.outputStream(fileType: String): ByteArrayOutputStream {
+    val outputStream = ByteArrayOutputStream()
+    outputStream.use {
+        when (fileType) {
+            "png" -> PngWriter().write(this, metadata, it)
+            "jpg" -> JpegWriter().write(this, metadata, it)
+            else -> throw IllegalArgumentException("Unsupported image format: $fileType")
+        }
+    }
+    return outputStream
 }

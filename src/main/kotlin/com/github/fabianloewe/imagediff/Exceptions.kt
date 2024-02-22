@@ -5,6 +5,10 @@ abstract class ImageDiffException(
     cause: Throwable? = null,
 ) : RuntimeException(message, cause)
 
+class UnknownImageComparatorException(
+    comparatorName: String,
+) : ImageDiffException("The image comparator '$comparatorName' is unknown")
+
 class MalformedCorrespondenceListException(
     missingColumn: String,
 ) : ImageDiffException("The correspondence list is malformed. The following column is missing: $missingColumn")
