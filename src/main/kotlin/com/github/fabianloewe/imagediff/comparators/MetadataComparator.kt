@@ -60,7 +60,7 @@ class MetadataComparator(
      * @see ImageComparator.compare
      */
     @OptIn(ExperimentalSerializationApi::class)
-    override fun compare(coverImage: Image, stegoImage: Image): Result<ImageComparisonData> {
+    override fun compare(coverImage: Image, stegoImage: Image): Result<ImageComparisonData> = runCatching {
         val coverMetadata = extractMetadata(coverImage)
         val stegoMetadata = extractMetadata(stegoImage)
 
@@ -89,19 +89,15 @@ class MetadataComparator(
         )
 
         val outputStream = ByteArrayOutputStream()
-        try {
-            json.encodeToStream(diffResult, outputStream)
-            val comparisonData = ImageComparisonData(
-                this,
-                coverImage,
-                stegoImage,
-                outputStream,
-                "json",
-            )
-            return Result.success(comparisonData)
-        } catch (e: Exception) {
-            return Result.failure(e)
-        }
+        json.encodeToStream(diffResult, outputStream)
+        val comparisonData = ImageComparisonData(
+            this,
+            coverImage,
+            stegoImage,
+            outputStream,
+            "json",
+        )
+        comparisonData
     }
 
     private fun extractMetadata(image: Image): Map<DiffKey, String> {

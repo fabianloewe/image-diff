@@ -70,7 +70,7 @@ class CompositeComparator : ImageComparator {
      */
     override val args by lazy { Args() }
 
-    override fun compare(coverImage: Image, stegoImage: Image): Result<ImageComparisonData> {
+    override fun compare(coverImage: Image, stegoImage: Image): Result<ImageComparisonData> = runCatching {
         val (prepCoverImage, prepStegoImage) = args.preprocess(coverImage, stegoImage)
 
         val diffImage = when (args.mode) {
@@ -88,7 +88,7 @@ class CompositeComparator : ImageComparator {
             outputStream,
             fileType ?: "img"
         )
-        return Result.success(comparisonData)
+        comparisonData
     }
 
     private fun Args.diffImageName(cover: Image, stego: Image): String {
@@ -136,10 +136,6 @@ class CompositeComparator : ImageComparator {
         )
         previousImageRef.set(newImage)
         return newImage
-    }
-
-    companion object {
-        const val NAME = "composite"
     }
 }
 

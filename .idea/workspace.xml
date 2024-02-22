@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Improved streaming and memory consumption greatly">
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageComparator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageExtractor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/ImageExtractor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/Utils.kt" afterDir="false" />
+    <list default="true" id="85eed22a-a13c-44e9-ba71-5522ff24ca7b" name="Changes" comment="Changed naming of processors to dash-case">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/CompositeComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/CompositeComparator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/comparators/MetadataComparator.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/LeastSignificantBitsExtractor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/github/fabianloewe/imagediff/extractors/LeastSignificantBitsExtractor.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -403,7 +403,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708599394708</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Changed naming of processors to dash-case">
+      <option name="closed" value="true" />
+      <created>1708599811891</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1708599811891</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -426,7 +434,8 @@
     <MESSAGE value="Truncate values" />
     <MESSAGE value="WIP with manual pixel comparison" />
     <MESSAGE value="Improved streaming and memory consumption greatly" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improved streaming and memory consumption greatly" />
+    <MESSAGE value="Changed naming of processors to dash-case" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed naming of processors to dash-case" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

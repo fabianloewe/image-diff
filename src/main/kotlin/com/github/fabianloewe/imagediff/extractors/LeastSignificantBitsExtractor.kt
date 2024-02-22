@@ -76,7 +76,7 @@ class LeastSignificantBitsExtractor : ImageExtractor {
 
     override val args by lazy { Args() }
 
-    override fun extract(image: Image): Result<ImageExtractionData> {
+    override fun extract(image: Image): Result<ImageExtractionData> = runCatching {
         val pixels = image.data.iterator().asSequence()
         val data = with(args) {
             pixels
@@ -86,6 +86,6 @@ class LeastSignificantBitsExtractor : ImageExtractor {
         }
 
         val fileExtension = "bin"
-        return Result.success(ImageExtractionData(this, image, data, fileExtension))
+        ImageExtractionData(this, image, data, fileExtension)
     }
 }
