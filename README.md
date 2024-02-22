@@ -37,11 +37,14 @@ Composite Comparator Options:
 
   Options for the composite comparator.
 
-  --image-dir=<text>    The directory to save the composite images to.
   --composite=<value>   The type of compositing to use.
   --preprocess=<value>  A preprocessing operation to apply to the images before
                         compositing them.
   --mode=<value>        The mode for applying the compositing operation.
+  -I, --default-image-type=<text>
+                        The default image type to use for the output. This will
+                        be used if the image type cannot be determined from the
+                        input images. (Default: png)
 
 Options:
   -c, --cover=<path>          The first file or directory containing images to

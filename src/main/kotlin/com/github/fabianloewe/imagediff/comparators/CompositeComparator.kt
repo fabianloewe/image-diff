@@ -48,6 +48,7 @@ class CompositeComparator : ImageComparator {
         val mode: ImageSequenceCompositingMode by modeOption
 
         private val defaultImageTypeOption = option(
+            "-I",
             "--default-image-type",
             help = "The default image type to use for the output. This will be used if the image type cannot be determined from the input images. (Default: `png`)"
         ).default("png")
