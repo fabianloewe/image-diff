@@ -1,5 +1,6 @@
 package com.github.fabianloewe.imagediff
 
+/*
 fun Iterable<DiffResult>.computeChangesPerImage(): Map<DiffResultId, Int> {
     return this.fold(emptyMap()) { acc, diffRes ->
         acc + (diffRes.id to diffRes.diff.values.sumOf { it.size })
@@ -22,6 +23,7 @@ fun Iterable<DiffResult>.computeRateOfChanges(): Map<String, Map<DiffKey, Float>
     return totalChangesPerKey.mapValues { (_, map) ->
         map.mapValues { (_, count) ->
             count / size
-        }
-    }
+        }.toSortedMap()
+    }.toSortedMap()
 }
+ */
