@@ -36,7 +36,9 @@ interface ImageComparator : ImageProcessor<ImageComparatorArgs> {
      * The name of the image comparator.
      */
     override val name: String
-        get() = this::class.simpleName!!.removeSuffix("Comparator")
+        get() = this::class.simpleName!!
+            .removeSuffix("Comparator")
+            .dashCase()
 
     /**
      * The options for the image comparator.

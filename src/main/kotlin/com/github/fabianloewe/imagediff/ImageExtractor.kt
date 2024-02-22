@@ -34,7 +34,9 @@ interface ImageExtractor {
      * The name of the image extractor.
      */
     val name: String
-        get() = this::class.simpleName!!.removeSuffix("Extractor")
+        get() = this::class.simpleName!!
+            .removeSuffix("Extractor")
+            .dashCase()
 
     /**
      * The options for the image extractor.

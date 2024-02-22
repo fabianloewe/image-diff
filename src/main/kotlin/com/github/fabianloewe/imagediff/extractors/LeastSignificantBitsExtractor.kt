@@ -72,6 +72,8 @@ class LeastSignificantBitsExtractor : ImageExtractor {
         }
     }
 
+    override val name = "lsb"
+
     override val args by lazy { Args() }
 
     override fun extract(image: Image): Result<ImageExtractionData> {

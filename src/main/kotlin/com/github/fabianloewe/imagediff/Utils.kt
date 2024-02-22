@@ -7,6 +7,7 @@ import me.tongfei.progressbar.ProgressBar
 import org.koin.core.component.KoinScopeComponent
 import java.io.ByteArrayOutputStream
 import java.nio.file.Path
+import java.util.*
 import kotlin.io.path.*
 
 val <T : KoinScopeComponent> T.logger get() = scope.logger
@@ -49,6 +50,10 @@ fun nameResultFileName(coverImage: Image, stegoImage: Image, extension: String):
 
 fun ByteArray.outputStream(): ByteArrayOutputStream {
     return ByteArrayOutputStream().also { it.write(this) }
+}
+
+fun String.dashCase(): String {
+    return this.replace(Regex("([a-z])([A-Z])"), "$1-$2").lowercase(Locale.getDefault())
 }
 
 /*
