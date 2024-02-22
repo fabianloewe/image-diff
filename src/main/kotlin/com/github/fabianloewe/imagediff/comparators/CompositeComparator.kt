@@ -33,24 +33,27 @@ class CompositeComparator : ImageComparator {
             "--composite",
             help = "The type of compositing to use."
         ).convert { it.toCompositeType() }.default(CompositeType.DIFF)
-
         val composite: CompositeType by compositeOption
 
         private val preprocessOption = option(
             "--preprocess",
             help = "A preprocessing operation to apply to the images before compositing them."
         ).convert { it.toImagePreprocessing() }.default(ImagePreprocessing.NONE)
-
         val preprocess: ImagePreprocessing by preprocessOption
 
         private val modeOption = option(
             "--mode",
             help = "The mode for applying the compositing operation."
         ).convert { it.toImageSequenceCompositingMode() }.default(ImageSequenceCompositingMode.NORMAL)
-
         val mode: ImageSequenceCompositingMode by modeOption
 
-        override val all = listOf(compositeOption, preprocessOption, modeOption)
+        private val defaultImageTypeOption = option(
+            "--default-image-type",
+            help = "The default image type to use for the output. This will be used if the image type cannot be determined from the input images. (Default: `png`)"
+        ).default("png")
+        val defaultImageType: String by defaultImageTypeOption
+
+        override val all = listOf(compositeOption, preprocessOption, modeOption, defaultImageTypeOption)
     }
 
     /**
@@ -67,14 +70,16 @@ class CompositeComparator : ImageComparator {
             ImageSequenceCompositingMode.REDUCE_STEGO -> composeByReduceStego(prepStegoImage, prepCoverImage)
         }
 
-        val fileType = diffImage.data.metadata.tagsBy { it.name == "Format" }.firstOrNull()?.value
-        val outputStream = diffImage.data.outputStream(fileType ?: "unknown")
+        val fileType = coverImage.data.expectedFileExtension()
+            ?: stegoImage.data.expectedFileExtension()
+            ?: args.defaultImageType
+        val outputStream = diffImage.data.outputStream(fileType)
         val comparisonData = ImageComparisonData(
             this,
             coverImage,
             stegoImage,
             outputStream,
-            fileType ?: "img"
+            fileType
         )
         comparisonData
     }
