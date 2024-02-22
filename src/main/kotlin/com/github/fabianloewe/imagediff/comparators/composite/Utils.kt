@@ -1,8 +1,6 @@
 package com.github.fabianloewe.imagediff.comparators.composite
 
-import com.sksamuel.scrimage.pixels.Pixel
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonPrimitive
+import com.sksamuel.scrimage.ImmutableImage
 
 fun String.toCompositeType(): CompositeType = when (this) {
     "diff" -> CompositeType.DIFF
@@ -28,12 +26,11 @@ fun String.toImageSequenceCompositingMode(): ImageSequenceCompositingMode = when
     else -> throw IllegalArgumentException("Unknown mode: $this")
 }
 
-fun Pixel.isNotBlack(): Boolean = toRGB().any { it > 0 }
 
-fun Pixel.toJsonArray(): JsonArray = JsonArray(
-    listOf(
-        JsonPrimitive(x),
-        JsonPrimitive(y),
-        JsonPrimitive(argb)
-    )
-)
+fun ImmutableImage.expectedFileExtension(): String? {
+    return this.metadata
+        .tagsBy { it.name == "Expected File Name Extension" }
+        .firstOrNull()
+        ?.value
+        ?.lowercase()
+}

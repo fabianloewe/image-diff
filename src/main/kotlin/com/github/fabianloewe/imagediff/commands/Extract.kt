@@ -56,7 +56,7 @@ class Extract(
     private val extractorsNames: Set<String> by option("--extractor")
         .multiple(default = allExtractors.map { it.name })
         .unique()
-        .help("The comparator to use")
+        .help("The extractor to use")
 
     private val filters: Map<String, String> by option("-F", "--filter")
         .associate()

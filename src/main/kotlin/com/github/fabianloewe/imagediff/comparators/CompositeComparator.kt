@@ -12,12 +12,7 @@ import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.JpegWriter
 import com.sksamuel.scrimage.nio.PngWriter
 import java.io.ByteArrayOutputStream
-import java.util.*
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.io.path.Path
-import kotlin.io.path.div
-import kotlin.io.path.extension
-import kotlin.io.path.nameWithoutExtension
 
 /**
  * A comparator that compares two images by compositing them and returning the difference image.
@@ -34,35 +29,32 @@ class CompositeComparator : ImageComparator {
     private val previousImageRef: AtomicReference<Image?> = AtomicReference()
 
     inner class Args : ImageComparatorArgs(this) {
-        private val imageDirOption = option(
-            "--image-dir",
-            help = "The directory to save the composite images to."
-        ).default("output/composites")
-
-        val imageDir: String by imageDirOption
-
         private val compositeOption = option(
             "--composite",
             help = "The type of compositing to use."
         ).convert { it.toCompositeType() }.default(CompositeType.DIFF)
-
         val composite: CompositeType by compositeOption
 
         private val preprocessOption = option(
             "--preprocess",
             help = "A preprocessing operation to apply to the images before compositing them."
         ).convert { it.toImagePreprocessing() }.default(ImagePreprocessing.NONE)
-
         val preprocess: ImagePreprocessing by preprocessOption
 
         private val modeOption = option(
             "--mode",
             help = "The mode for applying the compositing operation."
         ).convert { it.toImageSequenceCompositingMode() }.default(ImageSequenceCompositingMode.NORMAL)
-
         val mode: ImageSequenceCompositingMode by modeOption
 
-        override val all = listOf(imageDirOption, compositeOption, preprocessOption, modeOption)
+        private val defaultImageTypeOption = option(
+            "-I",
+            "--default-image-type",
+            help = "The default image type to use for the output. This will be used if the image type cannot be determined from the input images. (Default: `png`)"
+        ).default("png")
+        val defaultImageType: String by defaultImageTypeOption
+
+        override val all = listOf(compositeOption, preprocessOption, modeOption, defaultImageTypeOption)
     }
 
     /**
@@ -79,61 +71,34 @@ class CompositeComparator : ImageComparator {
             ImageSequenceCompositingMode.REDUCE_STEGO -> composeByReduceStego(prepStegoImage, prepCoverImage)
         }
 
-        val fileType = diffImage.data.metadata.tagsBy { it.name == "Format" }.firstOrNull()?.value
-        val outputStream = diffImage.data.outputStream(fileType ?: "unknown")
+        val fileType = coverImage.data.expectedFileExtension()
+            ?: stegoImage.data.expectedFileExtension()
+            ?: args.defaultImageType
+        val outputStream = diffImage.data.outputStream(fileType)
         val comparisonData = ImageComparisonData(
             this,
             coverImage,
             stegoImage,
             outputStream,
-            fileType ?: "img"
+            fileType
         )
         comparisonData
     }
 
-    private fun Args.diffImageName(cover: Image, stego: Image): String {
-        val coverName = cover.path.nameWithoutExtension
-        val stegoName = stego.path.nameWithoutExtension
-        val compositeName = composite.name.lowercase(Locale.getDefault())
-        val extension = cover.path.extension
-        if (extension != stego.path.extension) {
-            throw IllegalArgumentException("Cover and stego images must have the same file extension")
-        }
-
-        return when (mode) {
-            ImageSequenceCompositingMode.NORMAL -> "$coverName-$stegoName-$compositeName.$extension"
-            ImageSequenceCompositingMode.REDUCE_COVER -> {
-                if (compositeName in stegoName) "$stegoName-$compositeName.$extension"
-                else "$stegoName.$extension"
-            }
-
-            ImageSequenceCompositingMode.REDUCE_STEGO -> {
-                if (compositeName in coverName) "$coverName-$compositeName.$extension"
-                else "$coverName.$extension"
-            }
-        }
-    }
-
     private fun composeNormal(cover: Image, stego: Image): Image {
-        return args.composite(cover, stego).copy(
-            path = Path(args.imageDir) / args.diffImageName(cover, stego)
-        )
+        return args.composite(cover, stego)
     }
 
     private fun composeByReduceCover(cover: Image, stego: Image): Image {
         val previousImage = previousImageRef.get() ?: stego
-        val newImage = args.composite(previousImage, cover).copy(
-            path = Path(args.imageDir) / args.diffImageName(previousImage, cover),
-        )
+        val newImage = args.composite(previousImage, cover)
         previousImageRef.set(newImage)
         return newImage
     }
 
     private fun composeByReduceStego(stego: Image, cover: Image): Image {
         val previousImage = previousImageRef.get() ?: cover
-        val newImage = args.composite(previousImage, stego).copy(
-            path = Path(args.imageDir) / args.diffImageName(previousImage, stego),
-        )
+        val newImage = args.composite(previousImage, stego)
         previousImageRef.set(newImage)
         return newImage
     }
