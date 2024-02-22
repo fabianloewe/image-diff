@@ -5,7 +5,10 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.fabianloewe.imagediff.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.runBlocking
 import me.tongfei.progressbar.ProgressBarBuilder
 import org.koin.core.component.KoinScopeComponent
@@ -17,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.*
 
 class Extract(
-    private val extractors: Map<String, ImageExtractor>,
+    allExtractors: List<ImageExtractor>,
 ) : CliktCommand(), KoinScopeComponent {
     override val scope by newScope()
 
@@ -28,7 +31,7 @@ class Extract(
     private val stegoImagePath by option("-s", "--stego")
         .path()
         .required()
-        .help("The second file or directory containing images to compare")
+        .help("The file or directory containing images to compare")
 
     private val output by option("-o", "--output")
         .path()
@@ -51,7 +54,7 @@ class Extract(
         )
 
     private val extractorsNames: Set<String> by option("--extractor")
-        .multiple(default = extractors.keys.toList())
+        .multiple(default = allExtractors.map { it.name })
         .unique()
         .help("The comparator to use")
 
@@ -59,56 +62,49 @@ class Extract(
         .associate()
         .help("The case-sensitive filters to apply to the correspondences list on a certain column (e.g. --filter column1=value1)")
 
-    private val extractorsParams: Map<String, Any> by option("-P", "--extractor-param")
-        .associate()
-        .help("The parameters to pass to the extractors in the format extr1.param1=value")
-
     private val parallel by option("--parallel")
         .flag("--no-parallel", default = false)
         .help("Whether to extract from images in parallel. WARNING: This may consume a lot of memory and potentially crash the program. (default: false)")
 
-    override fun run() {
+    private val extractors by lazy {
+        extractorsNames.map { name ->
+            allExtractors.find { it.name == name }
+                ?: throw UnknownImageExtractorException(name)
+        }
+    }
+
+    init {
+        allExtractors.forEach {
+            this.registerOptionGroup(it.args)
+            it.args.all.forEach { opt -> registerOption(opt) }
+        }
+    }
+
+    override fun run() = runBlocking(coroutineContext) {
         try {
-            val extractionResults: Flow<Pair<Image, ExtractedData>> = if (stegoImagePath.isDirectory()) {
-                val stegoImages = collectFiles()
+            val stegoImages = if (stegoImagePath.isDirectory()) {
+                collectFiles()
+            } else {
+                sequenceOf(stegoImagePath)
+            }
 
-                val stegoImagesCount = stegoImages.count().toLong()
-                logger.info("Extracting from $stegoImagesCount images...")
+            val stegoImagesCount = stegoImages.count().toLong()
+            logger.info("Extracting from $stegoImagesCount image${if (stegoImagesCount == 1L) "" else "s"}...")
 
-                progressBarBuilder.setInitialMax(stegoImagesCount).build().use { progressBar ->
-                    val doExtract = { path: Path ->
-                        val image = Image(path)
-                        val extractedData = extract(image)
-                        progressBar.step()
-                        image to extractedData
-                    }
-
+            val progressBar = progressBarBuilder.setInitialMax(stegoImagesCount).build()
+            stegoImages
+                .map { path -> Image(path) }
+                .let {
                     if (parallel) {
                         logger.info("Extracting in parallel...")
-                        runBlocking(coroutineContext) {
-                            stegoImages.pmap(doExtract)
-                        }
+                        it.pmap(::extract)
                     } else {
-                        stegoImages.toList().map(doExtract).asFlow()
+                        logger.info("Extracting sequentially...")
+                        it.map(::extract).asFlow()
                     }
                 }
-            } else {
-                val stegoImage = Image(stegoImagePath)
-                flowOf(stegoImage to extract(stegoImage))
-            }
-
-            runBlocking {
-                extractionResults
-                    .onStart {
-                        output.createDirectories()
-                    }
-                    .onCompletion {
-                        logger.info("Done")
-                    }
-                    .collect { (image, extractedData) ->
-                        writeOutput(image, extractedData)
-                    }
-            }
+                .withProgressBar(progressBar)
+                .writeOutput()
         } catch (e: ImageDiffException) {
             logger.error(e.message)
         } catch (e: IOException) {
@@ -134,21 +130,41 @@ class Extract(
         } ?: stegoImagePath.gatherFiles()
     }
 
-    private fun extract(image: Image): ExtractedData {
-        return extractorsNames.associateWith { name ->
-            val extractor = extractors[name] ?: throw UnknownImageExtractorException(name)
-            val argsMap = extractorsParams.filterKeys { it.startsWith("$name.") }
-                .mapKeys { it.key.removePrefix("$name.") }
-            extractor.extract(image, argsMap)
+    private fun extract(image: Image): List<Result<ImageExtractionData>> {
+        return extractors.map { extractor ->
+            extractor.extract(image)
         }
     }
 
-    private fun writeOutput(image: Image, extractedData: ExtractedData) {
-        extractedData.forEach { (extractorName, extractorData) ->
-            val extractorOutput = output / "${image.path.nameWithoutExtension}_$extractorName.bin"
-            extractorOutput.outputStream().use {
-                it.write(extractorData)
-            }
+    private suspend fun Flow<List<Result<ImageExtractionData>>>.writeOutput() {
+        val outputDirPerComparator = extractors.associate { extract ->
+            val dir = output / "extract" / extract.name
+            extract.name to dir.createDirectories()
         }
+
+        this
+            .onStart {
+                logger.info("Writing output...")
+            }
+            .onCompletion {
+                logger.info("Done")
+            }
+            .collect { results ->
+                for (result in results) {
+                    result
+                        .onSuccess { data ->
+                            val dir = outputDirPerComparator[data.extractor.name]!!
+                            val path = dir / nameResultFileName(
+                                data.image,
+                                data.extractFileExtension,
+                            )
+                            data.extractOutput.writeTo(path.outputStream())
+                        }
+                        .onFailure { e ->
+                            logger.error("An error occurred: ${e.message}")
+                            e.printStackTrace(System.err)
+                        }
+                }
+            }
     }
 }

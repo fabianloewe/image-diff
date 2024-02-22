@@ -38,16 +38,16 @@ class Main : CliktCommand(name = "image-diff"), KoinComponent {
 fun main(args: Array<String>) {
     val appModule = module {
         single(named("comparators")) {
-            mapOf(
-                MetadataComparator.NAME to MetadataComparator(),
-                CompositeComparator.NAME to CompositeComparator(),
-            )
+            setOf(
+                MetadataComparator(get()),
+                CompositeComparator(),
+            ).toList()
         }
 
         single(named("extractors")) {
-            mapOf(
-                LeastSignificantBitsExtractor.NAME to LeastSignificantBitsExtractor()
-            )
+            setOf(
+                LeastSignificantBitsExtractor()
+            ).toList()
         }
 
         single {
